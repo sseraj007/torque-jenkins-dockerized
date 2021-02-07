@@ -25,7 +25,7 @@ COPY config.xml /usr/share/jenkins/ref/jobs/demo/config.xml
 USER root 
 RUN apt-get update && apt-get install -y awscli
 RUN apt-get install -y curl \
-  && curl -sL https://deb.nodesource.com/setup_9.x | bash - \
+  && curl -sL https://deb.nodesource.com/setup_10.x | bash - \
   && apt-get install -y nodejs \
   && curl -L https://www.npmjs.com/install.sh | sh
 
