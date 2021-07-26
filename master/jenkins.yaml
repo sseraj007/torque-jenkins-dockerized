@@ -1,7 +1,7 @@
 jenkins:
-  systemMessage: "Jenkins Test Colony Installation"
+  systemMessage: "Jenkins Test Torque Installation"
 
 unclassified:
   colony:
-    address: "https://cloudshellcolony.com"
+    address: "https://app.qtorque.io"
     token: "%TOKEN%"
