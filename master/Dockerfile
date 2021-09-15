@@ -29,6 +29,18 @@ RUN apt-get install -y curl \
   && apt-get install -y nodejs \
   && curl -L https://www.npmjs.com/install.sh | sh
 
+# Install dotnet core and dependencies
+RUN wget https://packages.microsoft.com/config/ubuntu/18.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
+RUN sudo dpkg -i packages-microsoft-prod.deb
+RUN rm packages-microsoft-prod.deb
+
+
+# Install the .Net Core framework, set the path, and show the version of core installed.
+RUN apt-get install -y apt-transport-https
+RUN apt-get install -y dotnet-sdk-3.1 && \
+    export PATH=$PATH:$HOME/dotnet && \
+    dotnet --version
+
 USER jenkins
 
 # Copy jenkins.yaml
