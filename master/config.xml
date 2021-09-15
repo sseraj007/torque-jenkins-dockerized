@@ -29,60 +29,29 @@ pipeline {
         }
         stage(&apos;Checkout&apos;) {
             steps {
-                dir(&quot;UI&quot;) {
-                    git &apos;https://QualiLabs@dev.azure.com/QualiLabs/Promotions%20Manager/_git/promotions-manager-ui&apos;
-                }
                 dir(&quot;API&quot;) {
-                    git &apos;https://QualiLabs@dev.azure.com/QualiLabs/Promotions%20Manager/_git/promotions-manager-api&apos;
-                }
-                dir(&quot;Testing&quot;) {
-                    git &apos;https://QualiLabs@dev.azure.com/QualiLabs/Promotions%20Manager/_git/Testing&apos;
+                    git &apos;https://github.com/sseraj007/secrets-mgr&apos;
                 }
             }
         }
         stage(&apos;Build&apos;) {
             steps {
-                dir(&quot;UI&quot;) {
-                    sh &quot;&quot;&quot;
-                    npm --legacy-peer-deps install --only=dev redux-immutable-state-invariant enzyme@3.8.0 enzyme-adapter-react-16@1.7.1 chai expect jsdom mocha react-addons-test-utils sinon
-                    export REACT_APP_BUILD_NUMBER=$BUILD_NUMBER &amp;&amp; npm run build
-                    &quot;&quot;&quot;
-                }
                 dir(&quot;API&quot;) {
                     sh &quot;&quot;&quot;
-                    npm install
-                    npm run test:ci
+                    dotnet clean --configuration Release
+                    dotnet build --configuration Release AWS.SecretMgr.sln
                     &quot;&quot;&quot;
                 }
             }
         }
         stage(&apos;Publish artifacts&apos;) {
             steps {
-                dir(&quot;UI&quot;) {
+                dir(&quot;API/AWS.SecretMgr/bin/Release/netcoreapp3.1&quot;) {
                     sh &quot;&quot;&quot;
                     mkdir drop
-                    cd build
-                    tar -czvf ../drop/promotions-manager-ui.${BUILD_NUMBER}.tar.gz *
-                    cd ..
-                    tar -czvf promotions-manager-ui.master.tar.gz drop/promotions-manager-ui.${BUILD_NUMBER}.tar.gz
-                    aws s3 cp promotions-manager-ui.master.tar.gz s3://%BUCKET_NAME%/promotions-manager/latest/
-                    &quot;&quot;&quot;
-                }
-                dir(&quot;API&quot;) {
-                    sh &quot;&quot;&quot;
-                    rm -r .git &amp; rm .gitignore &amp; rm azure-pipelines.yml &amp; rm -r test-output &amp; rm -r test
-                    mkdir drop
-                    tar -czvf drop/promotions-manager-api.${BUILD_NUMBER}.tar.gz --exclude=./drop .
-                    tar -czvf promotions-manager-api.master.tar.gz drop/promotions-manager-api.${BUILD_NUMBER}.tar.gz
-                    aws s3 cp promotions-manager-api.master.tar.gz s3://%BUCKET_NAME%/promotions-manager/latest/
-                    &quot;&quot;&quot;
-                }
-                dir(&quot;Testing&quot;) {
-                    sh &quot;&quot;&quot;
-                    cd data/test-db/
-                    mkdir archive
-                    tar -czvf archive/test-db.tar.gz --exclude=./archive .
-                    aws s3 cp archive/test-db.tar.gz s3://%BUCKET_NAME%/promotions-manager/latest/
+                    tar -czvf drop/secrets-manager-api.tar.gz --exclude=./drop .
+                    tar -czvf secrets-manager-api.tar.gz drop/secrets-manager-api.tar.gz
+                    aws s3 cp secrets-manager-api.tar.gz s3://%BUCKET_NAME%/secrets-manager/latest/
                     &quot;&quot;&quot;
                 }
             }
@@ -98,12 +67,10 @@ pipeline {
                         //TODO replace latest with current artifact from Build stage 
                         newSandboxData = colony.blueprint(
                             spaceName,                           // space name
-                            &apos;promotions-manager-all-aws&apos;,               // blueprint name
+                            &apos;secrets-api-aws&apos;,               // blueprint name
                             &apos;pm-test-sandbox-&apos; + env.BUILD_NUMBER,  // sandbox name
                             &apos;PT2H&apos;,                                 // sandbox duration according to ISO 8601 duration
-                            [&apos;promotions-manager-ui&apos;: &apos;promotions-manager/latest/promotions-manager-ui.master.tar.gz&apos;,        // artifacts
-                               &apos;promotions-manager-api&apos;: &apos;promotions-manager/latest/promotions-manager-api.master.tar.gz&apos;, 
-                               &apos;mongodb&apos;: &apos;promotions-manager/latest/test-db.tar.gz&apos;],    
+                            [&apos;secrets-manager-api&apos;: &apos;secrets-manager/latest/secrets-manager-api.tar.gz&apos;],    
                             [&apos;PORT&apos;: &apos;3000&apos;, &apos;API_PORT&apos;: &apos;3001&apos;, &apos;RELEASE_NUMBER&apos;: &apos;none&apos;, &apos;API_BUILD_NUMBER&apos;: env.BUILD_NUMBER, &apos;AWS_INSTANCE_TYPE&apos;: &apos;t3.large&apos;],       // inputs
                             30)                                                                                                         // timeout
                             .startSandbox()
@@ -128,34 +95,6 @@ pipeline {
                         }
                     }
                 }                
-            }
-        }
-        stage(&apos;UI Tests&apos;) {
-            steps {                
-                echo &apos;Running UI tests....&apos;
-
-                echo &apos;Done&apos;
-            }
-        }
-        stage(&apos;Load Tests&apos;) {
-            steps {
-                echo &apos;Running load tests....&apos;
-
-                echo &apos;Done&apos;
-            }
-        }
-        stage(&apos;Security Tests&apos;) {
-            steps {
-                echo &apos;Running security tests....&apos;
-
-                echo &apos;Done&apos;
-            }
-        }
-        stage(&apos;Backwards Compatibility Tests&apos;) {
-            steps {
-                echo &apos;Running tests....&apos;
-
-                echo &apos;Done&apos;
             }
         }
    }
