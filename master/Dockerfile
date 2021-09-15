@@ -18,8 +18,8 @@ RUN /usr/local/bin/install-plugins.sh < /usr/share/jenkins/plugins.txt
 COPY colony.hpi /usr/share/jenkins/ref/plugins/colony.hpi
 
 # Create job
-RUN mkdir -p /usr/share/jenkins/ref/jobs/demo/
-COPY config.xml /usr/share/jenkins/ref/jobs/demo/config.xml
+RUN mkdir -p /usr/share/jenkins/ref/jobs/secret-mgr/
+COPY config.xml /usr/share/jenkins/ref/jobs/secret-mgr/config.xml
 
 # Install aws cli and npm
 USER root 
