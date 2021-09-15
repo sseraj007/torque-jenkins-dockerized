@@ -37,9 +37,12 @@ RUN rm packages-microsoft-prod.deb
 
 # Install the .Net Core framework, set the path, and show the version of core installed.
 RUN apt-get install -y apt-transport-https
+RUN apt-get update
 RUN apt-get install -y dotnet-sdk-3.1 && \
     export PATH=$PATH:$HOME/dotnet && \
     dotnet --version
+RUN apt-get update
+RUN apt-get install -y aspnetcore-runtime-3.1
 
 USER jenkins
 
