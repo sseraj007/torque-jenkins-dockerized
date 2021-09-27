@@ -68,10 +68,10 @@ pipeline {
                         newSandboxData = colony.blueprint(
                             spaceName,                           // space name
                             &apos;secrets-api-aws&apos;,               // blueprint name
-                            &apos;pm-test-sandbox-&apos; + env.BUILD_NUMBER,  // sandbox name
+                            &apos;secrets-mgr-sbx&apos;,  // sandbox name
                             &apos;PT2H&apos;,                                 // sandbox duration according to ISO 8601 duration
                             [&apos;secrets-manager-api&apos;: &apos;secrets-manager/latest/secrets-manager-api.tar.gz&apos;],    
-                            [&apos;PORT&apos;: &apos;3000&apos;, &apos;API_PORT&apos;: &apos;3001&apos;, &apos;RELEASE_NUMBER&apos;: &apos;none&apos;, &apos;API_BUILD_NUMBER&apos;: env.BUILD_NUMBER, &apos;AWS_INSTANCE_TYPE&apos;: &apos;t3.large&apos;],       // inputs
+                            [&apos;API_PORT&apos;: &apos;3001&apos;, &apos;RELEASE_NUMBER&apos;: &apos;1&apos;, &apos;API_BUILD_NUMBER&apos;: &apos;1&apos;, &apos;AWS_INSTANCE_TYPE&apos;: &apos;t2.micro&apos;, &apos;IAM_ROLE&apos;: &apos;SecretsManagerEC2AccessRole&apos;],       // inputs
                             30)                                                                                                         // timeout
                             .startSandbox()
 
@@ -105,7 +105,7 @@ def getEndpoint(def newSandboxData) {
     def endpoint = &apos;&apos;
 
     for (app in newSandboxData.applications) {
-        if (app.name == &apos;promotions-manager-ui&apos;) {
+        if (app.name == &apos;secrets-manager-api&apos;) {
             endpoint = app.shortcuts[0]
             break
         }
