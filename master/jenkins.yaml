@@ -3,5 +3,5 @@ jenkins:
 
 unclassified:
   colony:
-    address: "https://app.qtorque.io"
+    address: "https://trial-1ea1b2d0.cloudshellcolony.com"
     token: "%TOKEN%"
